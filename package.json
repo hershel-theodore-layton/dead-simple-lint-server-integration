@@ -1,0 +1,50 @@
+{
+  "name": "dead-simple-lint-server-integration",
+  "description": "Display squiggles in your IDE by making calls to a lint server.",
+  "author": "Hershel Theodore Layton",
+  "license": "MIT",
+  "version": "1.0.0",
+  "publisher": "hershel-theodore-layton",
+  "repository": {
+    "url": "https://github.com/hershel-theodore-layton/dead-simple-lint-server-integration"
+  },
+  "categories": [],
+  "keywords": [
+    "multi-root ready"
+  ],
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "activationEvents": [
+    "onLanguage:hack"
+  ],
+  "main": "./client/out/extension",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Example configuration",
+      "properties": {
+        "lintServer.uri": {
+          "scope": "resource",
+          "type": "string",
+          "default": "http://not.configured.invalid",
+          "description": "URL at which lint-server lives. Ensure you trust this server, since it will receive copies of the source code."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./server/src/server.ts --bundle --outfile=server/out/server.js --external:vscode --format=cjs --platform=node && esbuild ./client/src/extension.ts --bundle --outfile=client/out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd .."
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.6",
+    "esbuild": "^0.21.1",
+    "typescript": "^5.3.3"
+  }
+}
