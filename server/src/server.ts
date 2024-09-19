@@ -81,12 +81,6 @@ connection.languages.diagnostics.on(async (params) => {
   } satisfies DocumentDiagnosticReport;
 });
 
-documents.onDidChangeContent((change) => {
-  getDocumentSettings(change.document.uri).then((settings) =>
-    validateHackSource(change.document, settings)
-  );
-});
-
 documents.listen(connection);
 
 connection.listen();
