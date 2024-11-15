@@ -20,15 +20,51 @@
   ],
   "main": "./client/out/extension",
   "contributes": {
+    "codeActions": [
+      {
+        "languages": [
+          "hack"
+        ],
+        "actions": [
+          {
+            "kind": "quick-fix",
+            "title": "Fix Lint Error",
+            "description": "Request the lint server how an error could be resolved. If a resolution is provided, apply the change."
+          }
+        ]
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Example configuration",
       "properties": {
         "lintServer.uri": {
+          "deprecationMessage": "Please use lintServer.lintFileUri, lintServer.uri is not specific enough, now that there is more than one uri to configure.",
           "scope": "resource",
           "type": "string",
           "default": "http://not.configured.invalid",
-          "description": "URL at which lint-server lives. Ensure you trust this server, since it will receive copies of the source code."
+          "description": "Only retained for backwards compatibility, subsumed by lintServer.lintFileUri."
+        },
+        "lintServer.lintFileUri": {
+          "scope": "resource",
+          "type": "string",
+          "default": "http://not.configured.invalid",
+          "description": "URL at which lint-server exposes the lint-input endpoint. Ensure you trust this server, since it will receive copies of the source code."
+        },
+        "lintServer.autofixUri": {
+          "scope": "resource",
+          "type": "string",
+          "default": "http://not.configured.invalid",
+          "description": "URL at which lint-server exposes the autofix-input endpoint. Ensure you trust this server, since it will receive copies of the source code."
+        },
+        "lintServer.autoFixUri": {
+          "deprecationMessage": "Did you mean `lintServer.autofixUri`?"
+        },
+        "lintServer.fixableSource": {
+          "scope": "resource",
+          "type": "string",
+          "default": "Portable Hack AST Linters Server",
+          "description": "The name of the lint server. This allows the extension to recognize errors that the server is able to fix."
         }
       }
     }

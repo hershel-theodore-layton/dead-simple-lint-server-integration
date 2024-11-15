@@ -4,79 +4,51 @@
  * ------------------------------------------------------------------------------------------ */
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-
-export type Settings = {
-  uri: string;
-};
+import { Curl, Settings } from "./shared";
+import { typ, TypeAssert } from "./typ";
 
 export async function validateHackSource(
   document: TextDocument,
   settings: Settings
-): Promise<Diagnostic[]> {
-  try {
-    if (typeof fetch !== "function") {
-      throw new Error(
-        "Your vscode is built with a node version that does not have fetch(...)."
-      );
+): Promise<ReturnType<typeof ts>> {
+  const curl = new Curl();
+  // using settings.uri for backwards compat
+  const url = new URL(settings.lintFileUri ?? settings.uri);
+  const json = await curl.json(url, ts, { body: document.getText() });
+
+  for (const obj of json) {
+    for (const info of obj.relatedInformation ?? []) {
+      info.location.uri = document.uri;
     }
-
-    let res = await fetch(settings.uri, {
-      method: "POST",
-      body: document.getText(),
-      headers: {
-        "User-Agent": "Dead Simple Lint Server Integration",
-      },
-    }).catch((_) => {
-      throw new Error(`Lint server at ${settings.uri} could not be reached.`);
-    });
-
-    if (res.status !== 200) {
-      throw new Error(
-        `Server returned non-OK status code: ${
-          res.status
-        }\n${await res.text()}.`
-      );
-    }
-
-    const json = await res.json();
-
-    if (!Array.isArray(json)) {
-      throw new Error(
-        `Server returned something other than an array of lints: ${await res.text()}.`
-      );
-    }
-
-    for (const diag of json) {
-      if (
-        typeof diag !== "object" ||
-        diag === null ||
-        !("severity" in diag) ||
-        !("range" in diag) ||
-        !("message" in diag)
-      ) {
-        throw new Error(
-          "The server returned an object that doesn't match the vscode Diagnostic type."
-        );
-      }
-
-      for (const rel of diag.relatedInformation ?? []) {
-        rel.location.uri = document.uri;
-      }
-    }
-
-    return json;
-  } catch (e) {
-    const err = e as Error;
-    return [
-      {
-        severity: DiagnosticSeverity.Warning,
-        range: {
-          start: document.positionAt(0),
-          end: document.positionAt(3),
-        },
-        message: `${err.message} This file will not be linted.`,
-        source: "JavaScript in the Extension",
-      },
-    ];
   }
+
+  return json;
 }
+
+const range = typ.object({
+  start: typ.object({ line: typ.number(), character: typ.number() }),
+  end: typ.object({ line: typ.number(), character: typ.number() }),
+});
+
+const ts = typ.array(
+  typ.object({
+    range,
+    severity: typ.anyOf([1, 2, 3, 4]),
+    message: typ.string(),
+    relatedInformation: typ.optional(
+      typ.array(
+        typ.object({
+          location: typ.object({
+            range,
+            uri: typ.forTypescript(typ.string()),
+          }),
+          message: typ.string(),
+        })
+      )
+    ),
+    autofix: typ.optional(
+      typ.array(typ.object({ range, replaceWith: typ.string() }))
+    ),
+    source: typ.optional(typ.string()),
+  })
+) satisfies TypeAssert<Diagnostic[]>;
