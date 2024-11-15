@@ -3,7 +3,7 @@
   "description": "Display squiggles in your IDE by making calls to a lint server.",
   "author": "Hershel Theodore Layton",
   "license": "MIT",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "hershel-theodore-layton",
   "repository": {
     "url": "https://github.com/hershel-theodore-layton/dead-simple-lint-server-integration"
