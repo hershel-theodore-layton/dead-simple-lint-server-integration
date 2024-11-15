@@ -56,7 +56,7 @@ export const typ = {
     > =>
     (mixed: unknown) => {
       if (typeof mixed !== "object" || mixed === null) {
-        mismatch(jsonify`Expected object, got ${mixed}`);
+        mismatch(jsonify`: Expected object, got ${mixed}`);
       }
       for (const [k, v] of Object.entries(inner)) {
         try {
