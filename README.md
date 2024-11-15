@@ -26,47 +26,12 @@ Content-Length: ...
 some source code in plain text
 ```
 
-The server should respond with json in the shape of:
-
-```TS
-import { Diagnostic } from "vscode-languageserver";
-type ResponseType = Diagnostic[];
-```
-
-The properties serverity, message, and range are required.
+The server should respond with json in the shape found in the `ts` constant in
+[validateHackSource.ts](server/src/validateHackSource.ts)
 
 This extension was written to integrate with [portable-hack-ast-linters](https://github.com/hershel-theodore-layton/portable-hack-ast-linters).
 
-To turn a `HTL\PhaLinters\LintError` into a Diagnostic, the following code was used.
-Assume the following code sample to be outdated.
-
-```HACK
-$e = ...; // Some LintError
-shape(
-  'start' => shape(
-    'line' => $e->getPosition()->getStartLine(),
-    // Assume bytes and characters are the same thing. I hope you write code in ASCII.
-    'character' => $e->getPosition()->getStartColumn(),
-  ),
-  'end' => shape(
-    'line' => $e->getPosition()->getEndLine(),
-    'character' => $e->getPosition()->getEndColumn(),
-  ),
-)
-  |> shape(
-    // Warning / Yellow Squiggle
-    'severity' => 2,
-    'message' => $e->getLinterNameWithoutNamespaceAndLinter(),
-    'range' => $$,
-    'source' => 'Dead Simple Portable Hack Linters Server Side Integration',
-    'relatedInformation' => vec[shape(
-      'location' => shape(
-        'range' => $$,
-      ),
-      'message' => $e->getDescription()
-    )],
-  )
-```
+You can find a server for this extension in [portable-hack-ast-linters-server](https://github.com/hershel-theodore-layton/portable-hack-ast-linters-server/blob/master/src/main.hack).
 
 ### Software Quality
 

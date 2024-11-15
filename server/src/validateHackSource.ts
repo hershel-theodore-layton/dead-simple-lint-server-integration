@@ -12,8 +12,7 @@ export async function validateHackSource(
   settings: Settings
 ): Promise<ReturnType<typeof ts>> {
   const curl = new Curl();
-  // using settings.uri for backwards compat
-  const url = new URL(settings.lintFileUri ?? settings.uri);
+  const url = new URL(settings.uri);
   const json = await curl.json(url, ts, { body: document.getText() });
 
   for (const obj of json) {

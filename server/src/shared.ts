@@ -5,10 +5,7 @@
 import { Range } from "vscode-languageserver-textdocument";
 
 export type Settings = {
-  /** @deprecated Use lintFileUri */
   uri: string;
-  lintFileUri: string;
-  autofixUri: string;
   fixableSource: string;
 };
 
