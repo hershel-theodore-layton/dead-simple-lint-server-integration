@@ -1,3 +1,7 @@
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) Hershel Theodore Layton. All rights reserved.
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ * ------------------------------------------------------------------------------------------ */
 import { Range } from "vscode-languageserver-textdocument";
 
 export type Settings = {
